@@ -13,9 +13,17 @@ final class StoreSurveyQuestionAction
      * @param SurveyDTO $dto
      * @return array
      */
-    public function handle(SurveyDTO $dto): array
+    public function handle(SurveyQuestionDTO $dto): array
     {
         return DB::transaction(function () use ($dto) {
+            // Logic to store survey question goes here
+            // This is a placeholder return statement
+            return [
+                'title' => $dto->title,
+                'question_type' => $dto->questionType,
+                'options' => $dto->options,
+                'survey_id' => $dto->surveyId,
+            ];
         });
     }
 }

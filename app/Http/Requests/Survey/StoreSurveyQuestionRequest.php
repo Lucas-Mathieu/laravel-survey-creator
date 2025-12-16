@@ -11,7 +11,7 @@ class StoreSurveyQuestionRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return auth()->check() && auth()->user()->can('create', SurveyQuestion::class);
     }
 
     /**
@@ -22,7 +22,10 @@ class StoreSurveyQuestionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'title' => 'required|string|max:255',
+            'question_type' => 'required|string|in:multiple_choice,text,checkbox',
+            'options' => 'json|required_if:question_type,multiple_choice,checkbox',
+            'survey_id' => 'required|exists:surveys,id',
         ];
     }
 }
