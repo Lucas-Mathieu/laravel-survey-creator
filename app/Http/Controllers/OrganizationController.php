@@ -49,9 +49,10 @@ class OrganizationController extends Controller
         $dto = OrganizationDTO::fromRequest($request);
         $organization = $action->handle($dto);
 
-        return redirect()
-            ->route('organizations.index')
-            ->with('status', 'Organization created successfully.');
+        return response()->json([
+            'data' => $organization,
+            'message' => 'organization created successfully',
+        ], 201);
     }
 
     public function update(UpdateOrganization $request, Organization $organization, UpdateOrganizationAction $action)
