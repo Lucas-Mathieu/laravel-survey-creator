@@ -2,20 +2,43 @@
 namespace App\Actions\Survey;
 
 use App\DTOs\SurveyDTO;
+use App\Models\Survey;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Auth\Access\AuthorizationException;
 
 final class UpdateSurveyAction
 {
-    public function __construct() {}
-
     /**
      * Update a Survey
+     * @param Survey $survey
      * @param SurveyDTO $dto
-     * @return array
+     * @return Survey
      */
-    public function handle(SurveyDTO $dto): array
+    public function handle(Survey $survey, SurveyDTO $dto): Survey
     {
-        return DB::transaction(function () use ($dto) {
+        $organizationId = session('organization_id');
+
+        if (!$organizationId) {
+            throw ValidationException::withMessages([
+                'organization_id' => 'Organization is required to update a survey.',
+            ]);
+        }
+
+        if ((int) $survey->organization_id !== (int) $organizationId) {
+            throw new AuthorizationException('You cannot update a survey outside your organization.');
+        }
+
+        return DB::transaction(function () use ($survey, $dto) {
+            $survey->update([
+                'title' => $dto->title,
+                'description' => $dto->description,
+                'start_date' => $dto->startDate,
+                'end_date' => $dto->endDate,
+                'is_anonymous' => $dto->isAnonymous,
+            ]);
+
+            return $survey->refresh();
         });
     }
 }
