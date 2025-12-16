@@ -43,7 +43,7 @@ class OrganizationController extends Controller
         $organization = $action->handle($dto);
 
         return response()->json([
-            'data' => $organization, 
+            'data' => $organization,
             'message' => 'organization created successfully',
         ], 201);
     }
