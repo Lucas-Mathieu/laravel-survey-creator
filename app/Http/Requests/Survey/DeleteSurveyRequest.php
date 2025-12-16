@@ -11,7 +11,9 @@ class DeleteSurveyRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        $survey = $this->route('survey');
+
+        return $this->user()?->can('delete', $survey) ?? false;
     }
 
     /**

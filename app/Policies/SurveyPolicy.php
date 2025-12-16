@@ -4,7 +4,7 @@ namespace App\Policies;
 
 use App\Models\Survey;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
+use App\Models\OrganizationUser;
 
 class SurveyPolicy
 {
@@ -13,7 +13,7 @@ class SurveyPolicy
      */
     public function viewAny(User $user): bool
     {
-        return true;
+        return OrganizationUser::where('user_id', $user->id)->exists();
     }
 
     /**
@@ -21,10 +21,9 @@ class SurveyPolicy
      */
     public function view(User $user, Survey $survey): bool
     {
-        if (OrganizationUser::where('organization_id', $organization->id)->where('user_id', $user->id)->exists()) {
+        if (OrganizationUser::where('organization_id', $survey->organization_id)->where('user_id', $user->id)->exists()) {
             return true;
-        }
-        else {
+        } else {
             return false;
         }
     }
@@ -34,7 +33,17 @@ class SurveyPolicy
      */
     public function create(User $user): bool
     {
-        return true;
+        $orgId = session('organization_id');
+
+        if (!$orgId) {
+            return false;
+        }
+
+        if (OrganizationUser::where('organization_id', $orgId)->where('user_id', $user->id)->exists()) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -42,10 +51,13 @@ class SurveyPolicy
      */
     public function update(User $user, Survey $survey): bool
     {
-        if (OrganizationUser::where('organization_id', $organization->id)->where('user_id', $user->id)->exists()) {
+        $isOwner = $survey->user_id === $user->id;
+
+        if (OrganizationUser::where('organization_id', $survey->organization_id)->where('user_id', $user->id)->where('role', 'admin')->exists()) {
             return true;
-        }
-        else {
+        } elseif ($isOwner) {
+            return true;
+        } else {
             return false;
         }
     }
@@ -55,10 +67,13 @@ class SurveyPolicy
      */
     public function delete(User $user, Survey $survey): bool
     {
-        if (OrganizationUser::where('organization_id', $organization->id)->where('user_id', $user->id)->exists()) {
+        $isOwner = $survey->user_id === $user->id;
+
+        if (OrganizationUser::where('organization_id', $survey->organization_id)->where('user_id', $user->id)->where('role', 'admin')->exists()) {
             return true;
-        }
-        else {
+        } elseif ($isOwner) {
+            return true;
+        } else {
             return false;
         }
     }
@@ -68,12 +83,7 @@ class SurveyPolicy
      */
     public function restore(User $user, Survey $survey): bool
     {
-        if (OrganizationUser::where('organization_id', $organization->id)->where('user_id', $user->id)->exists()) {
-            return true;
-        }
-        else {
-            return false;
-        }
+        return $this->delete($user, $survey);
     }
 
     /**
@@ -81,11 +91,6 @@ class SurveyPolicy
      */
     public function forceDelete(User $user, Survey $survey): bool
     {
-        if (OrganizationUser::where('organization_id', $organization->id)->where('user_id', $user->id)->exists()) {
-            return true;
-        }
-        else {
-            return false;
-        }
+        return $this->delete($user, $survey);
     }
 }
