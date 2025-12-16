@@ -6,6 +6,7 @@ use App\Actions\Survey\StoreSurveyAction;
 use App\Actions\Survey\UpdateSurveyAction;
 use App\Http\Requests\Survey\StoreSurveyRequest;
 use App\Http\Requests\Survey\UpdateSurveyRequest;
+use App\Http\Requests\Survey\DeleteSurveyRequest;
 use App\DTOs\SurveyDTO;
 use App\Models\Survey;
 use App\Models\OrganizationUser;
@@ -21,7 +22,7 @@ class SurveyController extends Controller
 
         $surveys = Survey::whereIn('organization_id', $orgIds)->get();
 
-        return view('surveys.index', [
+        return view('survey', [
             'surveys' => $surveys,
         ]);
     }
@@ -31,15 +32,14 @@ class SurveyController extends Controller
         return view('survey');
     }
 
-    public function store(StoreSurveyRequest $request, StoreSurveyAction $storeSurvey): JsonResponse
+    public function store(StoreSurveyRequest $request, StoreSurveyAction $storeSurvey)
     {
         $dto = SurveyDTO::fromRequest($request);
         $survey = $storeSurvey->handle($dto);
 
-        return response()->json([
-            'data' => $survey,
-            'message' => 'Survey created successfully.',
-        ], 201);
+        return redirect()
+            ->route('surveys.index')
+            ->with('status', 'Survey created successfully.');
     }
 
     public function edit(Survey $survey)
@@ -52,10 +52,9 @@ class SurveyController extends Controller
         $dto = SurveyDTO::fromRequest($request);
         $survey = $updateSurvey->handle($survey, $dto);
 
-        return response()->json([
-            'data' => $survey,
-            'message' => 'Survey updated successfully.',
-        ]);
+        return redirect()
+            ->route('surveys.index')
+            ->with('status', 'Survey updated successfully.');
     }
 
     public function show(Survey $survey)
@@ -65,12 +64,12 @@ class SurveyController extends Controller
         ]);
     }
 
-    public function destroy(Survey $survey)
+    public function destroy(DeleteSurveyRequest $request, Survey $survey)
     {
         $survey->delete();
 
-        return response()->json([
-            'message' => 'Survey deleted successfully.',
-        ]);
+        return redirect()
+            ->route('surveys.index')
+            ->with('status', 'Survey deleted successfully.');
     }
 }
