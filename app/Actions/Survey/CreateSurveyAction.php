@@ -1,0 +1,34 @@
+<?php
+
+namespace App\Actions\Survey;
+
+use App\DTOs\SurveyDTO;
+use App\Models\Survey;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
+
+final class CreateSurveyAction
+{
+    public function handle(SurveyDTO $dto): Survey
+    {
+        $organizationId = session('organization_id');
+
+        if (!$organizationId) {
+            throw ValidationException::withMessages([
+                'organization_id' => 'Organization is required to create a survey.',
+            ]);
+        }
+
+        return DB::transaction(function () use ($dto, $organizationId) {
+            return Survey::create([
+                'title' => $dto->title,
+                'description' => $dto->description,
+                'start_date' => $dto->startDate,
+                'end_date' => $dto->endDate,
+                'is_anonymous' => $dto->isAnonymous,
+                'user_id' => $dto->userId,
+                'organization_id' => $organizationId,
+            ]);
+        });
+    }
+}

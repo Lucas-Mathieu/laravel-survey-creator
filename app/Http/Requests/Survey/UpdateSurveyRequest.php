@@ -11,7 +11,9 @@ class UpdateSurveyRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        $survey = $this->route('survey');
+
+        return $this->user()?->can('update', $survey) ?? false;
     }
 
     /**
@@ -22,7 +24,21 @@ class UpdateSurveyRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date',
+            'is_anonymous' => 'required|boolean',
         ];
+    }
+
+    /**
+     * Normalize incoming data before validation.
+     */
+    protected function prepareForValidation(): void
+    {
+        $this->merge([
+            'is_anonymous' => $this->boolean('is_anonymous'),
+        ]);
     }
 }
