@@ -3,6 +3,7 @@ namespace App\Actions\Survey;
 
 use App\DTOs\SurveyDTO;
 use App\Models\Survey;
+use App\Models\OrganizationUser;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -10,7 +11,8 @@ final class StoreSurveyAction
 {
     public function handle(SurveyDTO $dto): Survey
     {
-        $organizationId = session('organization_id');
+        $organizationId = session('organization_id')
+            ?? OrganizationUser::where('user_id', $dto->userId)->value('organization_id');
 
         if (!$organizationId) {
             throw ValidationException::withMessages([
