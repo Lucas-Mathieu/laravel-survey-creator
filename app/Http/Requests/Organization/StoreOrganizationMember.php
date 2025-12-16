@@ -2,17 +2,19 @@
 
 namespace App\Http\Requests\Organization;
 
-use App\Models\Organization;
 use Illuminate\Foundation\Http\FormRequest;
+use App\Models\Organization;
 
-class StoreOrganization extends FormRequest
+class StoreOrganizationMember extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return $this->user()?->can('create', Organization::class) ?? false;
+        $organization = $this->route('organization');
+
+        return $this->user()?->can('update', $organization ?? Organization::class) ?? false;
     }
 
     /**
@@ -23,8 +25,8 @@ class StoreOrganization extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'max:255'],
             'user_id' => ['required', 'integer', 'exists:users,id'],
+            'role'    => ['required', 'in:admin,member'],
         ];
     }
 }

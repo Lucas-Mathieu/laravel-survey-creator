@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Organization;
 
 use Illuminate\Foundation\Http\FormRequest;
+use App\Models\Organization;
 
 class UpdateOrganization extends FormRequest
 {
@@ -11,7 +12,9 @@ class UpdateOrganization extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        $organization = $this->route('organization');
+
+        return $this->user()?->can('update', $organization ?? Organization::class) ?? false;
     }
 
     /**
@@ -22,7 +25,7 @@ class UpdateOrganization extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'name' => ['required', 'string', 'max:255'],
         ];
     }
 }

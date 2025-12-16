@@ -4,6 +4,7 @@ namespace App\Policies;
 
 use App\Models\Organization;
 use App\Models\User;
+use App\Models\OrganizationUser;
 use Illuminate\Auth\Access\Response;
 
 class OrganizationPolicy
@@ -13,7 +14,7 @@ class OrganizationPolicy
      */
     public function viewAny(User $user): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -21,7 +22,12 @@ class OrganizationPolicy
      */
     public function view(User $user, Organization $organization): bool
     {
-        return false;
+        if (OrganizationUser::where('organization_id', $organization->id)->where('user_id', $user->id)->exists()) {
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 
     /**
@@ -29,7 +35,7 @@ class OrganizationPolicy
      */
     public function create(User $user): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -37,7 +43,12 @@ class OrganizationPolicy
      */
     public function update(User $user, Organization $organization): bool
     {
-        return false;
+        if (OrganizationUser::where('organization_id', $organization->id)->where('user_id', $user->id)->where('role', 'admin')->exists()) {
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 
     /**
@@ -45,7 +56,12 @@ class OrganizationPolicy
      */
     public function delete(User $user, Organization $organization): bool
     {
-        return false;
+        if (OrganizationUser::where('organization_id', $organization->id)->where('user_id', $user->id)->where('role', 'admin')->exists()) {
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 
     /**
@@ -53,7 +69,12 @@ class OrganizationPolicy
      */
     public function restore(User $user, Organization $organization): bool
     {
-        return false;
+        if (OrganizationUser::where('organization_id', $organization->id)->where('user_id', $user->id)->where('role', 'admin')->exists()) {
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 
     /**
@@ -61,6 +82,11 @@ class OrganizationPolicy
      */
     public function forceDelete(User $user, Organization $organization): bool
     {
-        return false;
+        if (OrganizationUser::where('organization_id', $organization->id)->where('user_id', $user->id)->where('role', 'admin')->exists()) {
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 }

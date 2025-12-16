@@ -6,12 +6,12 @@ use App\DTOs\OrganizationMemberDTO;
 use App\Models\OrganizationUser;
 use Illuminate\Support\Facades\DB;
 
-final class StoreOrganizationMemberAction
+final class DeleteOrganizationMemberAction
 {
     public function __construct() {}
 
     /**
-     * Store an organization member
+     * Delete an organization member
      * @param OrganizationMemberDTO $dto
      * @return array
      * @throws \Throwable
@@ -19,11 +19,10 @@ final class StoreOrganizationMemberAction
     public function handle(OrganizationMemberDTO $dto): array
     {
         return DB::transaction(function () use ($dto) {
-            $organizationUser = OrganizationUser::create([
-                'organization_id' => $dto->organizationId,
-                'user_id'         => $dto->userId,
-                'role'            => $dto->role,
-            ]);
+            $organizationUser = OrganizationUser::where('organization_id', $dto->organizationId)
+                ->where('user_id', $dto->userId)
+                ->firstOrFail();
+            $organizationUser->delete();
 
             return $organizationUser->toArray();
         });
