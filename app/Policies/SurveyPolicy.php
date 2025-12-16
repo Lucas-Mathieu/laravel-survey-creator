@@ -35,15 +35,12 @@ class SurveyPolicy
     {
         $orgId = session('organization_id');
 
-        if (!$orgId) {
-            return false;
+        if ($orgId && OrganizationUser::where('organization_id', $orgId)->where('user_id', $user->id)->exists()) {
+            return true;
         }
 
-        if (OrganizationUser::where('organization_id', $orgId)->where('user_id', $user->id)->exists()) {
-            return true;
-        } else {
-            return false;
-        }
+        // fallback: autoriser si l'utilisateur a au moins une organisation
+        return OrganizationUser::where('user_id', $user->id)->exists();
     }
 
     /**

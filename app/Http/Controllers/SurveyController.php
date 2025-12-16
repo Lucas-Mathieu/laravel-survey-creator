@@ -11,7 +11,6 @@ use App\DTOs\SurveyDTO;
 use App\Models\Survey;
 use App\Models\OrganizationUser;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\JsonResponse;
 
 class SurveyController extends Controller
 {
@@ -42,15 +41,23 @@ class SurveyController extends Controller
             ->with('status', 'Survey created successfully.');
     }
 
-    public function edit(Survey $survey)
+    public function edit(Request $request, Survey $survey)
     {
-        return view('survey', compact('survey'));
+        $orgIds = OrganizationUser::where('user_id', $request->user()->id)
+            ->pluck('organization_id');
+
+        $surveys = Survey::whereIn('organization_id', $orgIds)->get();
+
+        return view('survey', [
+            'survey' => $survey,
+            'surveys' => $surveys,
+        ]);
     }
 
     public function update(UpdateSurveyRequest $request, Survey $survey, UpdateSurveyAction $updateSurvey)
     {
         $dto = SurveyDTO::fromRequest($request);
-        $survey = $updateSurvey->handle($survey, $dto);
+        $updateSurvey->handle($survey, $dto);
 
         return redirect()
             ->route('surveys.index')
