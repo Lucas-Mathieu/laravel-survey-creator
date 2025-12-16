@@ -15,25 +15,47 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 class SurveyController extends Controller
 {
-    public function index(Request $request)
+    private function ensureActiveOrganization(Request $request): ?int
     {
         $orgIds = OrganizationUser::where('user_id', $request->user()->id)
             ->pluck('organization_id');
 
-        $surveys = Survey::whereIn('organization_id', $orgIds)->get();
+        $activeOrgId = $request->session()->get('active_organization_id');
+
+        if (!$activeOrgId && $orgIds->isNotEmpty()) {
+            $activeOrgId = $orgIds->first();
+            $request->session()->put('active_organization_id', $activeOrgId);
+        }
+
+        return $activeOrgId;
+    }
+
+    public function index(Request $request)
+    {
+        $activeOrgId = $this->ensureActiveOrganization($request);
+
+        $surveys = $activeOrgId
+            ? Survey::where('organization_id', $activeOrgId)->get()
+            : collect();
 
         return view('survey', [
             'surveys' => $surveys,
+            'activeOrganizationId' => $activeOrgId,
         ]);
     }
 
     public function create()
     {
+        $this->ensureActiveOrganization(request());
+
         return view('survey');
     }
 
     public function store(StoreSurveyRequest $request, StoreSurveyAction $storeSurvey)
     {
+        $this->ensureActiveOrganization($request);
+        $this->authorize('create', Survey::class);
+
         $dto = SurveyDTO::fromRequest($request);
         $survey = $storeSurvey->handle($dto);
 
@@ -44,11 +66,15 @@ class SurveyController extends Controller
 
     public function edit(Survey $survey)
     {
+        $this->authorize('update', $survey);
+
         return view('survey', compact('survey'));
     }
 
     public function update(UpdateSurveyRequest $request, Survey $survey, UpdateSurveyAction $updateSurvey)
     {
+        $this->authorize('update', $survey);
+
         $dto = SurveyDTO::fromRequest($request);
         $survey = $updateSurvey->handle($survey, $dto);
 
@@ -59,6 +85,8 @@ class SurveyController extends Controller
 
     public function show(Survey $survey)
     {
+        $this->authorize('view', $survey);
+
         return response()->json([
             'data' => $survey,
         ]);
@@ -66,6 +94,8 @@ class SurveyController extends Controller
 
     public function destroy(DeleteSurveyRequest $request, Survey $survey)
     {
+        $this->authorize('delete', $survey);
+
         $survey->delete();
 
         return redirect()

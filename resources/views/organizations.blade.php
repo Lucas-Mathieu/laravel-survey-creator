@@ -43,11 +43,20 @@
                             <div class="border rounded p-4 mb-4">
                                 <div class="flex items-center justify-between">
                                     <div class="font-semibold">{{ $organization->name }}</div>
-                                    <form method="POST" action="{{ route('organizations.destroy', $organization) }}">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="text-red-600 hover:underline">Delete</button>
-                                    </form>
+                                    <div class="flex items-center space-x-3">
+                                        <form method="POST" action="{{ route('organizations.active') }}">
+                                            @csrf
+                                            <input type="hidden" name="organization_id" value="{{ $organization->id }}">
+                                            <button type="submit" class="text-sm {{ ($activeOrganizationId ?? null) == $organization->id ? 'text-green-700 font-semibold' : 'text-indigo-600 hover:underline' }}">
+                                                {{ ($activeOrganizationId ?? null) == $organization->id ? 'Active' : 'Set active' }}
+                                            </button>
+                                        </form>
+                                        <form method="POST" action="{{ route('organizations.destroy', $organization) }}">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="text-red-600 hover:underline">Delete</button>
+                                        </form>
+                                    </div>
                                 </div>
 
                                 <div class="mt-3">

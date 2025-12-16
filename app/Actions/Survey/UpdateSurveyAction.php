@@ -17,7 +17,7 @@ final class UpdateSurveyAction
      */
     public function handle(Survey $survey, SurveyDTO $dto): Survey
     {
-        $organizationId = session('organization_id') ?? $survey->organization_id;
+        $organizationId = session('active_organization_id') ?? $survey->organization_id;
 
         if (!$organizationId) {
             throw ValidationException::withMessages([

@@ -23,6 +23,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/organizations', [OrganizationController::class, 'create'])->name('organizations.store');
     Route::patch('/organizations/{organization}', [OrganizationController::class, 'update'])->name('organizations.update');
     Route::delete('/organizations/{organization}', [OrganizationController::class, 'destroy'])->name('organizations.destroy');
+    Route::post('/organizations/active', [OrganizationController::class, 'setActive'])->name('organizations.active');
 
     // Organization members
     Route::post('/organizations/{organization}/members', [OrganizationController::class, 'storeMember'])->name('organizations.members.store');
