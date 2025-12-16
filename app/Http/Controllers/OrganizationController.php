@@ -32,8 +32,15 @@ class OrganizationController extends Controller
             OrganizationUser::where('user_id', $request->user()->id)->pluck('organization_id')
         )->get();
 
+        $organizationMembers = OrganizationUser::with('user')
+            ->whereIn('organization_id', $organizations->pluck('id'))
+            ->get()
+            ->groupBy('organization_id');
+
         return view('organizations', [
             'organizations' => $organizations,
+            'users' => User::all(),
+            'organizationMembers' => $organizationMembers,
         ]);
     }
 
@@ -42,10 +49,9 @@ class OrganizationController extends Controller
         $dto = OrganizationDTO::fromRequest($request);
         $organization = $action->handle($dto);
 
-        return response()->json([
-            'data' => $organization, 
-            'message' => 'organization created successfully',
-        ], 201);
+        return redirect()
+            ->route('organizations.index')
+            ->with('status', 'Organization created successfully.');
     }
 
     public function update(UpdateOrganization $request, Organization $organization, UpdateOrganizationAction $action)
@@ -58,10 +64,9 @@ class OrganizationController extends Controller
 
         $updated = $action->handle($dto);
 
-        return response()->json([
-            'data' => $updated,
-            'message' => 'organization updated successfully',
-        ]);
+        return redirect()
+            ->route('organizations.index')
+            ->with('status', 'Organization updated successfully.');
     }
 
     public function destroy(DeleteOrganization $request, Organization $organization, DeleteOrganizationAction $action)
@@ -74,10 +79,9 @@ class OrganizationController extends Controller
 
         $deleted = $action->handle($dto);
 
-        return response()->json([
-            'data' => $deleted,
-            'message' => 'organization deleted successfully',
-        ]);
+        return redirect()
+            ->route('organizations.index')
+            ->with('status', 'Organization deleted successfully.');
     }
 
     public function storeMember(StoreOrganizationMember $request, Organization $organization, StoreOrganizationMemberAction $action)
@@ -90,10 +94,9 @@ class OrganizationController extends Controller
 
         $member = $action->handle($dto);
 
-        return response()->json([
-            'data' => $member,
-            'message' => 'member added successfully',
-        ], 201);
+        return redirect()
+            ->route('organizations.index')
+            ->with('status', 'Member added successfully.');
     }
 
     public function destroyMember(DeleteOrganizationMember $request, Organization $organization, User $user, DeleteOrganizationMemberAction $action)
@@ -106,9 +109,8 @@ class OrganizationController extends Controller
 
         $deleted = $action->handle($dto);
 
-        return response()->json([
-            'data' => $deleted,
-            'message' => 'member removed successfully',
-        ]);
+        return redirect()
+            ->route('organizations.index')
+            ->with('status', 'Member removed successfully.');
     }
 }

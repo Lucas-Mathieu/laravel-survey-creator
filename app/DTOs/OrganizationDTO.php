@@ -17,7 +17,7 @@ final class OrganizationDTO
         return new self(
             organizationId: $request->input('organization_id') ?? $request->input('id'),
             name: (string) $request->input('name', ''),
-            userId: (int) ($request->user()?->id ?? $request->input('user_id')),
+            userId: (int) $request->user()?->id,
         );
     }
 }
