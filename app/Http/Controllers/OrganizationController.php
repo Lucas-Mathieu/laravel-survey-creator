@@ -32,7 +32,9 @@ class OrganizationController extends Controller
             OrganizationUser::where('user_id', $request->user()->id)->pluck('organization_id')
         )->get();
 
-        return response()->json($organizations);
+        return view('organizations', [
+            'organizations' => $organizations,
+        ]);
     }
 
     public function create(StoreOrganization $request, StoreOrganizationAction $action)
