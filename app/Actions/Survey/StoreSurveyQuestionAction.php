@@ -22,6 +22,7 @@ final class StoreSurveyQuestionAction
                 'title' => $dto->title,
                 'question_type' => $dto->questionType,
                 'options' => $dto->options,
+                'survey_id' => $dto->surveyId,
             ];
         });
     }

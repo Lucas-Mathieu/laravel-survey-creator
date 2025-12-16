@@ -10,6 +10,7 @@ final class SurveyQuestionDTO
         public readonly string $title,
         public readonly string $questionType,
         public readonly ?string $options,
+        public readonly int $surveyId,
     ) {}
 
     public static function fromRequest(StoreQuestionRequest $request): self
@@ -18,6 +19,7 @@ final class SurveyQuestionDTO
             title: $request->input('title'),
             questionType: $request->input('question_type'),
             options: $request->input('options'),
+            surveyId: $request->input('survey_id'),
         );
     }
 }
