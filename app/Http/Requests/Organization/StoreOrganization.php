@@ -24,7 +24,6 @@ class StoreOrganization extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'user_id' => ['required', 'integer', 'exists:users,id'],
         ];
     }
 }
