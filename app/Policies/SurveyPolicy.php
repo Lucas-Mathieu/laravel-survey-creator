@@ -13,7 +13,7 @@ class SurveyPolicy
      */
     public function viewAny(User $user): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -21,7 +21,12 @@ class SurveyPolicy
      */
     public function view(User $user, Survey $survey): bool
     {
-        return false;
+        if (OrganizationUser::where('organization_id', $organization->id)->where('user_id', $user->id)->exists()) {
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 
     /**
@@ -29,7 +34,7 @@ class SurveyPolicy
      */
     public function create(User $user): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -37,7 +42,12 @@ class SurveyPolicy
      */
     public function update(User $user, Survey $survey): bool
     {
-        return false;
+        if (OrganizationUser::where('organization_id', $organization->id)->where('user_id', $user->id)->exists()) {
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 
     /**
@@ -45,7 +55,12 @@ class SurveyPolicy
      */
     public function delete(User $user, Survey $survey): bool
     {
-        return false;
+        if (OrganizationUser::where('organization_id', $organization->id)->where('user_id', $user->id)->exists()) {
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 
     /**
@@ -53,7 +68,12 @@ class SurveyPolicy
      */
     public function restore(User $user, Survey $survey): bool
     {
-        return false;
+        if (OrganizationUser::where('organization_id', $organization->id)->where('user_id', $user->id)->exists()) {
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 
     /**
@@ -61,6 +81,11 @@ class SurveyPolicy
      */
     public function forceDelete(User $user, Survey $survey): bool
     {
-        return false;
+        if (OrganizationUser::where('organization_id', $organization->id)->where('user_id', $user->id)->exists()) {
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 }
