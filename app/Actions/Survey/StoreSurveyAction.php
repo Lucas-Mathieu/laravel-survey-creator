@@ -11,7 +11,7 @@ final class StoreSurveyAction
 {
     public function handle(SurveyDTO $dto): Survey
     {
-        $organizationId = session('active_organization_id')
+        $organizationId = $dto->organizationId
             ?? OrganizationUser::where('user_id', $dto->userId)->value('organization_id');
 
         if (!$organizationId) {

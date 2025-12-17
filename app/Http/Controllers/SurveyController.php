@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Actions\Survey\StoreSurveyAction;
 use App\Actions\Survey\UpdateSurveyAction;
+use App\Actions\Survey\DeleteSurveyAction;
 use App\Http\Requests\Survey\StoreSurveyRequest;
 use App\Http\Requests\Survey\UpdateSurveyRequest;
 use App\Http\Requests\Survey\DeleteSurveyRequest;
@@ -15,28 +16,16 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 class SurveyController extends Controller
 {
-    private function ensureActiveOrganization(Request $request): ?int
-    {
-        $orgIds = OrganizationUser::where('user_id', $request->user()->id)
-            ->pluck('organization_id');
-
-        $activeOrgId = $request->session()->get('active_organization_id');
-
-        if (!$activeOrgId && $orgIds->isNotEmpty()) {
-            $activeOrgId = $orgIds->first();
-            $request->session()->put('active_organization_id', $activeOrgId);
-        }
-
-        return $activeOrgId;
-    }
-
     public function index(Request $request)
     {
         $activeOrgId = $this->ensureActiveOrganization($request);
 
+        // Only show surveys for the active organization.
         $surveys = $activeOrgId
             ? Survey::where('organization_id', $activeOrgId)->get()
             : collect();
+
+        $this->authorize('viewAny', Survey::class);
 
         return view('survey', [
             'surveys' => $surveys,
@@ -46,9 +35,13 @@ class SurveyController extends Controller
 
     public function create()
     {
-        $this->ensureActiveOrganization(request());
+        $activeOrgId = $this->ensureActiveOrganization(request());
+        // Guard create access via policy.
+        $this->authorize('create', Survey::class);
 
-        return view('survey');
+        return view('survey', [
+            'activeOrganizationId' => $activeOrgId,
+        ]);
     }
 
     public function store(StoreSurveyRequest $request, StoreSurveyAction $storeSurvey)
@@ -96,7 +89,7 @@ class SurveyController extends Controller
     {
         $this->authorize('delete', $survey);
 
-        $survey->delete();
+        app(DeleteSurveyAction::class)->handle($survey);
 
         return redirect()
             ->route('surveys.index')

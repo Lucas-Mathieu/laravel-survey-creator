@@ -37,9 +37,8 @@ class OrganizationController extends Controller
             ->get()
             ->groupBy('organization_id');
 
-        if (!$request->session()->has('active_organization_id') && $organizations->count() > 0) {
-            $request->session()->put('active_organization_id', $organizations->first()->id);
-        }
+        // Set a default active organization for the session if missing.
+        $this->ensureActiveOrganization($request);
 
         return view('organizations', [
             'organizations' => $organizations,
@@ -63,12 +62,6 @@ class OrganizationController extends Controller
 
     public function update(UpdateOrganization $request, Organization $organization, UpdateOrganizationAction $action)
     {
-        if ((int) $request->session()->get('active_organization_id') !== (int) $organization->id) {
-            return redirect()
-                ->route('organizations.index')
-                ->withErrors(['organization_id' => 'You must switch to this organization to update it.']);
-        }
-
         $dto = new OrganizationDTO(
             organizationId: $organization->id,
             name: $request->validated()['name'],
@@ -84,12 +77,6 @@ class OrganizationController extends Controller
 
     public function destroy(DeleteOrganization $request, Organization $organization, DeleteOrganizationAction $action)
     {
-        if ((int) $request->session()->get('active_organization_id') !== (int) $organization->id) {
-            return redirect()
-                ->route('organizations.index')
-                ->withErrors(['organization_id' => 'You must switch to this organization to delete it.']);
-        }
-
         $dto = new OrganizationDTO(
             organizationId: $organization->id,
             name: $organization->name,
@@ -105,12 +92,6 @@ class OrganizationController extends Controller
 
     public function storeMember(StoreOrganizationMember $request, Organization $organization, StoreOrganizationMemberAction $action)
     {
-        if ((int) $request->session()->get('active_organization_id') !== (int) $organization->id) {
-            return redirect()
-                ->route('organizations.index')
-                ->withErrors(['organization_id' => 'You must switch to this organization to add members.']);
-        }
-
         $dto = new OrganizationMemberDTO(
             organizationId: $organization->id,
             userId: (int) $request->input('user_id'),
@@ -126,12 +107,6 @@ class OrganizationController extends Controller
 
     public function destroyMember(DeleteOrganizationMember $request, Organization $organization, User $user, DeleteOrganizationMemberAction $action)
     {
-        if ((int) $request->session()->get('active_organization_id') !== (int) $organization->id) {
-            return redirect()
-                ->route('organizations.index')
-                ->withErrors(['organization_id' => 'You must switch to this organization to remove members.']);
-        }
-
         $dto = new OrganizationMemberDTO(
             organizationId: $organization->id,
             userId: $request->input('user_id') ?? $user->id,
