@@ -23,6 +23,7 @@ class SurveyController extends Controller
 {
     public function index(Request $request)
     {
+        // Ensure an active organization exists for scoping surveys.
         $activeOrgId = $this->ensureActiveOrganization($request);
 
         // Only show surveys for the active organization.
@@ -40,6 +41,7 @@ class SurveyController extends Controller
 
     public function create()
     {
+        // Initialize active org context before creating a survey.
         $activeOrgId = $this->ensureActiveOrganization(request());
         // Guard create access via policy.
         $this->authorize('create', Survey::class);
@@ -51,6 +53,7 @@ class SurveyController extends Controller
 
     public function store(StoreSurveyRequest $request, StoreSurveyAction $storeSurvey)
     {
+        // Ensure active org context and authorize creation.
         $this->ensureActiveOrganization($request);
         $this->authorize('create', Survey::class);
 
@@ -64,6 +67,7 @@ class SurveyController extends Controller
 
     public function edit(Request $request, Survey $survey)
     {
+        // Load surveys for the user's organizations (used for list + edit view).
         $orgIds = OrganizationUser::where('user_id', $request->user()->id)
             ->pluck('organization_id');
 
@@ -77,6 +81,7 @@ class SurveyController extends Controller
 
     public function update(UpdateSurveyRequest $request, Survey $survey, UpdateSurveyAction $updateSurvey)
     {
+        // Only owner/admin can update.
         $this->authorize('update', $survey);
 
         $dto = SurveyDTO::fromRequest($request);
@@ -89,22 +94,25 @@ class SurveyController extends Controller
 
     public function createQuestion(Request $request, Survey $survey)
     {
+        // Render the question creation form for this survey.
         return view('survey_question_create', [
             'survey' => $survey,
         ]);
     }
     public function storeQuestion(StoreSurveyQuestionRequest $request, Survey $survey, StoreSurveyQuestionAction $storeSurveyQuestion)
     {
+        // Persist a question linked to this survey.
         $dto = SurveyQuestionDTO::fromRequest($request);
-        $question = $storeSurveyQuestion->handle($dto);
+        $storeSurveyQuestion->handle($dto);
 
         return redirect()
-            ->route('surveys.show', $survey)
+            ->route('surveys.index')
             ->with('status', 'Question created successfully.');
     }
 
     public function show(Survey $survey)
     {
+        // Show survey JSON for internal usage.
         $this->authorize('view', $survey);
 
         return response()->json([
@@ -114,6 +122,7 @@ class SurveyController extends Controller
 
     public function destroy(DeleteSurveyRequest $request, Survey $survey)
     {
+        // Only owner/admin can delete.
         $this->authorize('delete', $survey);
 
         app(DeleteSurveyAction::class)->handle($survey);
@@ -125,6 +134,7 @@ class SurveyController extends Controller
 
     public function generatePublicLink(Survey $survey, GenerateSurveyTokenAction $action)
     {
+        // Only the survey owner can generate a public token.
         if ((int) $survey->user_id !== (int) auth()->id()) {
             abort(403);
         }
@@ -138,15 +148,25 @@ class SurveyController extends Controller
 
     public function publicShow(string $token)
     {
+        // Public survey entrypoint by token.
         $survey = Survey::where('public_token', $token)->firstOrFail();
 
+        // Validate active period.
         $now = Carbon::now();
         if ($now->lt(Carbon::parse($survey->start_date)) || $now->gt(Carbon::parse($survey->end_date))) {
             abort(403);
         }
 
+        // For non-anonymous surveys, require login.
+        if (! $survey->is_anonymous && ! auth()->check()) {
+            return redirect()
+                ->route('login')
+                ->with('status', 'Please sign in to answer this survey.');
+        }
+
         return view('survey_public', [
             'survey' => $survey,
+            'questions' => $survey->questions()->orderBy('id')->get(),
         ]);
     }
 }

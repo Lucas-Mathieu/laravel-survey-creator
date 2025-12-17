@@ -13,9 +13,10 @@ class SurveyQuestion extends Model
     public $timestamps  = true;
     protected $fillable = [
         'id', 'survey_id',
-        'title', 'question_type', 'options',
+        'title', 'question_type', 'data',
         'created_at', 'updated_at'
     ];
     protected $casts = [
+        'data' => 'array',
     ];
 }

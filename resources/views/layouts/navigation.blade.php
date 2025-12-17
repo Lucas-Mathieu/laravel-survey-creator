@@ -27,6 +27,7 @@
                         {{ __('Surveys') }}
                     </x-nav-link>
                 </div>
+                @auth
                 <div class="hidden sm:flex sm:items-center sm:ms-6">
                     <form method="POST" action="{{ route('organizations.active') }}" class="flex items-center space-x-2">
                         @csrf
@@ -45,9 +46,11 @@
                         </select>
                     </form>
                 </div>
+                @endauth
             </div>
 
             <!-- Settings Dropdown -->
+            @auth
             <div class="hidden sm:flex sm:items-center sm:ms-6">
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
@@ -80,6 +83,7 @@
                     </x-slot>
                 </x-dropdown>
             </div>
+            @endauth
 
             <!-- Hamburger -->
             <div class="-me-2 flex items-center sm:hidden">
@@ -105,6 +109,7 @@
             <x-responsive-nav-link :href="route('surveys.index')" :active="request()->routeIs('surveys.*')">
                 {{ __('Surveys') }}
             </x-responsive-nav-link>
+            @auth
             <div class="px-4">
                 <form method="POST" action="{{ route('organizations.active') }}">
                     @csrf
@@ -123,9 +128,11 @@
                     </select>
                 </form>
             </div>
+            @endauth
         </div>
 
         <!-- Responsive Settings Options -->
+        @auth
         <div class="pt-4 pb-1 border-t border-gray-200">
             <div class="px-4">
                 <div class="font-medium text-base text-gray-800">{{ Auth::user()->name }}</div>
@@ -149,5 +156,6 @@
                 </form>
             </div>
         </div>
+        @endauth
     </div>
 </nav>

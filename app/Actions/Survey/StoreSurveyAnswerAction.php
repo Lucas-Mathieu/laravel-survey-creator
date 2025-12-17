@@ -2,6 +2,7 @@
 namespace App\Actions\Survey;
 
 use App\DTOs\SurveyAnswerDTO;
+use App\Events\SurveyAnswerSubmitted;
 use App\Models\Survey;
 use App\Models\SurveyAnswer;
 use App\Models\SurveyQuestion;
@@ -31,7 +32,8 @@ final class StoreSurveyAnswerAction
             $created = [];
             foreach ($dto->answers as $answer) {
                 $questionId = (int) ($answer['question_id'] ?? 0);
-                $value = (string) ($answer['answer'] ?? '');
+                $raw = $answer['answer'] ?? '';
+                $value = is_array($raw) ? json_encode(array_values($raw)) : (string) $raw;
 
                 if (! isset($questionIdSet[$questionId])) {
                     throw ValidationException::withMessages([
@@ -46,6 +48,8 @@ final class StoreSurveyAnswerAction
                     'answer' => $value,
                 ])->toArray();
             }
+
+            event(new SurveyAnswerSubmitted());
 
             return $created;
         });

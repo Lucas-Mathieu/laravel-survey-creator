@@ -25,7 +25,7 @@ class StoreSurveyAnswerRequest extends FormRequest
             'survey_id' => ['required', 'integer', 'exists:surveys,id'],
             'answers' => ['required', 'array', 'min:1'],
             'answers.*.question_id' => ['required', 'integer', 'exists:survey_questions,id'],
-            'answers.*.answer' => ['required', 'string'],
+            'answers.*.answer' => ['required'],
         ];
     }
 }

@@ -38,7 +38,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/surveys/{survey}/edit', [SurveyController::class, 'edit'])->name('surveys.edit');
     Route::patch('/surveys/{survey}', [SurveyController::class, 'update'])->name('surveys.update');
     Route::delete('/surveys/{survey}', [SurveyController::class, 'destroy'])->name('surveys.destroy');
-    Route::post('/surveys/{survey}/answers', [SurveyAnswerController::class, 'store'])->name('surveys.answers.store');
     Route::post('/surveys/{survey}/share', [SurveyController::class, 'generatePublicLink'])->name('surveys.share');
     
     // Survey questions
@@ -47,5 +46,6 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::get('/survey/{token}', [SurveyController::class, 'publicShow'])->name('surveys.public');
+Route::post('/surveys/{survey}/answers', [SurveyAnswerController::class, 'store'])->name('surveys.answers.store');
 
 require __DIR__.'/auth.php';
