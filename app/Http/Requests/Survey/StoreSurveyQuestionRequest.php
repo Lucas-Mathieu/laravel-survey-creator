@@ -20,15 +20,38 @@ class StoreSurveyQuestionRequest extends FormRequest
      */
     protected function prepareForValidation(): void
     {
+        $questionType = $this->input('question_type');
+
+        // If the question type doesn't need choices, ensure options is null so the 'json' rule won't run
+        if ($questionType !== null && ! in_array($questionType, ['multiple_choice', 'unique_choice', 'checkbox'], true)) {
+            $this->merge(['options' => null]);
+            return;
+        }
+
         $options = $this->input('options');
 
         if ($options === null) {
             return;
         }
 
+        // Normalize empty string to null so validation rules like 'json' don't run when field is empty
+        if (trim($options) === '') {
+            $this->merge(['options' => null]);
+            return;
+        }
+
+        // Normalize escaped newline sequences (e.g. "\r\n" or "\n") to real newlines
+        $options = str_replace(['\\r\\n', '\\n', '\\r'], PHP_EOL, $options);
+
+        // If client sent literal 'rn' (e.g. from certain editors), convert to newline when no real newlines exist
+        if (strpos($options, "\n") === false && strpos($options, "\r") === false && strpos($options, 'rn') !== false) {
+            $options = str_replace('rn', PHP_EOL, $options);
+        }
+
         // If already valid JSON, keep it
         json_decode($options);
         if (json_last_error() === JSON_ERROR_NONE) {
+            $this->merge(['options' => $options]);
             return;
         }
 
@@ -51,9 +74,10 @@ class StoreSurveyQuestionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => 'required|string|max:255',   
+            'title' => 'required|string|max:255',
             'question_type' => 'required|string|in:multiple_choice,text,checkbox,unique_choice,scale_from_1_to_10',
-            'options' => 'json|required_if:question_type,multiple_choice,unique_choice',
+            // Options are optional unless the question type requires choices
+            'options' => 'nullable|json|required_if:question_type,multiple_choice,unique_choice',
             'survey_id' => 'required|exists:surveys,id',
         ];
     }

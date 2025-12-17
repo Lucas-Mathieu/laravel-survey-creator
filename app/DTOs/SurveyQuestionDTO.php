@@ -19,7 +19,7 @@ final class SurveyQuestionDTO
             title: $request->input('title'),
             questionType: $request->input('question_type'),
             options: $request->input('options'),
-            surveyId: $request->input('survey_id'),
+            surveyId: (int) $request->input('survey_id'),
         );
     }
 }
