@@ -22,7 +22,9 @@ class SurveyController extends Controller
 
         // Only show surveys for the active organization.
         $surveys = $activeOrgId
-            ? Survey::where('organization_id', $activeOrgId)->get()
+            ? Survey::where('organization_id', $activeOrgId)
+                ->where('survey_closed', false)
+                ->get()
             : collect();
 
         $this->authorize('viewAny', Survey::class);
