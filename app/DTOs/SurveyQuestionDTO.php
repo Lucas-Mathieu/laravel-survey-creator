@@ -13,7 +13,7 @@ final class SurveyQuestionDTO
         public readonly int $surveyId,
     ) {}
 
-    public static function fromRequest(StoreQuestionRequest $request): self
+    public static function fromRequest(Request $request): self
     {
         return new self(
             title: $request->input('title'),

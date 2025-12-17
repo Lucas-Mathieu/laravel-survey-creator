@@ -48,17 +48,18 @@
                             <label for="question_type" class="block text-sm font-medium text-slate-900">Type of question</label>
                             <select id="question_type" name="question_type" required class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm text-slate-900 focus:border-indigo-500 focus:ring-indigo-500">
                                 <option value="text" {{ old('question_type') == 'text' ? 'selected' : '' }}>Text</option>
-                                <option value="scale from 1 to 10" {{ old('question_type') == 'scale_from_1_to_10' ? 'selected' : '' }}>scale from 1 to 10</option>
+                                <option value="scale_from_1_to_10" {{ old('question_type') == 'scale_from_1_to_10' ? 'selected' : '' }}>scale from 1 to 10</option>
                                 <option value="multiple_choice" {{ old('question_type') == 'multiple_choice' ? 'selected' : '' }}>multiple choice</option>
                                 <option value="unique_choice" {{ old('question_type') == 'unique_choice' ? 'selected' : '' }}>unique choice</option>
                             </select>
                         </div>
                         <div class="space-y-1">
-                            <label for="options" class="block text-sm font-medium text-slate-900">Options to fill in for multiple-choice or checkbox selections.</label>
+                            <label for="options" class="block text-sm font-medium text-slate-900">Options (une par ligne ou séparées par des virgules)</label>
                             <textarea
                                 id="options"
                                 name="options"
                                 rows="4"
+                                placeholder="Option 1,Option 2,Option 3  ou  une option par ligne"
                                 class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm text-slate-900 focus:border-indigo-500 focus:ring-indigo-500"
                             >{{ old('options') }}</textarea>
                         </div>

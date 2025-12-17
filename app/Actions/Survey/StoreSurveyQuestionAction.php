@@ -2,6 +2,7 @@
 namespace App\Actions\Survey;
 
 use App\DTOs\SurveyDTO;
+use App\DTOs\SurveyQuestionDTO;
 use Illuminate\Support\Facades\DB;
 
 final class StoreSurveyQuestionAction

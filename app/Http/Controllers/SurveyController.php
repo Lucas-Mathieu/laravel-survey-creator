@@ -74,13 +74,13 @@ class SurveyController extends Controller
             'survey' => $survey,
         ]);
     }
-    public function storeQuestion(StoreSurveyQuestionRequest $request, Survey $survey)
+    public function storeQuestion(StoreSurveyQuestionRequest $request, Survey $survey, StoreSurveyQuestionAction $storeSurveyQuestion)
     {
         $dto = SurveyQuestionDTO::fromRequest($request);
         $question = $storeSurveyQuestion->handle($dto);
 
         return redirect()
-            ->route('surveys.show', $survey)
+            ->route('surveys.questions.create', $survey)
             ->with('status', 'Question created successfully.');
     }
 
