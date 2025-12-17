@@ -28,7 +28,9 @@ class SurveyController extends Controller
 
         // Only show surveys for the active organization.
         $surveys = $activeOrgId
-            ? Survey::where('organization_id', $activeOrgId)->get()
+            ? Survey::where('organization_id', $activeOrgId)
+                ->where('survey_closed', false)
+                ->get()
             : collect();
 
         $this->authorize('viewAny', Survey::class);
@@ -151,9 +153,8 @@ class SurveyController extends Controller
         // Public survey entrypoint by token.
         $survey = Survey::where('public_token', $token)->firstOrFail();
 
-        // Validate active period.
-        $now = Carbon::now();
-        if ($now->lt(Carbon::parse($survey->start_date)) || $now->gt(Carbon::parse($survey->end_date))) {
+        // Block access if survey is closed.
+        if ($survey->survey_closed) {
             abort(403);
         }
 
