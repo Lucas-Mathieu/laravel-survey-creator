@@ -12,7 +12,7 @@ class Survey extends Model
     protected $table    = 'surveys';
     public $timestamps  = true;
     protected $fillable = [
-        'id', 'organization_id', 'user_id',
+        'id', 'public_token', 'organization_id', 'user_id',
         'title', 'description', 'start_date', 'end_date', 'is_anonymous',
         'created_at', 'updated_at'
     ];

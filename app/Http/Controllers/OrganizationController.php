@@ -12,6 +12,7 @@ use App\Http\Requests\Organization\UpdateOrganization;
 use App\Http\Requests\Organization\DeleteOrganization;
 use App\Http\Requests\Organization\StoreOrganizationMember;
 use App\Http\Requests\Organization\DeleteOrganizationMember;
+use App\Http\Requests\Organization\SetActiveOrganization;
 
 use App\Actions\Organization\StoreOrganizationAction;
 use App\Actions\Organization\UpdateOrganizationAction;
@@ -37,10 +38,14 @@ class OrganizationController extends Controller
             ->get()
             ->groupBy('organization_id');
 
+        // Set a default active organization for the session if missing.
+        $this->ensureActiveOrganization($request);
+
         return view('organizations', [
             'organizations' => $organizations,
             'users' => User::all(),
             'organizationMembers' => $organizationMembers,
+            'activeOrganizationId' => $request->session()->get('active_organization_id'),
         ]);
     }
 
@@ -49,10 +54,11 @@ class OrganizationController extends Controller
         $dto = OrganizationDTO::fromRequest($request);
         $organization = $action->handle($dto);
 
-        return response()->json([
-            'data' => $organization,
-            'message' => 'organization created successfully',
-        ], 201);
+        $request->session()->put('active_organization_id', $organization['id']);
+
+        return redirect()
+            ->route('organizations.index')
+            ->with('status', 'Organization created successfully.');
     }
 
     public function update(UpdateOrganization $request, Organization $organization, UpdateOrganizationAction $action)
@@ -113,5 +119,16 @@ class OrganizationController extends Controller
         return redirect()
             ->route('organizations.index')
             ->with('status', 'Member removed successfully.');
+    }
+
+    public function setActive(SetActiveOrganization $request)
+    {
+        $orgId = (int) $request->input('organization_id');
+
+        $request->session()->put('active_organization_id', $orgId);
+
+        return redirect()
+            ->route('organizations.index')
+            ->with('status', 'Active organization updated.');
     }
 }

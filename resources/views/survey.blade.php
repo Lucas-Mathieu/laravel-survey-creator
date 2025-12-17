@@ -54,6 +54,18 @@
                                                     <td class="px-4 py-2 text-slate-700">{{ $surveyItem->is_anonymous ? 'Yes' : 'No' }}</td>
                                                     <td class="px-4 py-2 text-slate-700">
                                                         <a href="{{ route('surveys.edit', $surveyItem) }}" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">Edit</a>
+                                                        <form action="{{ route('surveys.share', $surveyItem) }}" method="POST" class="inline">
+                                                            @csrf
+                                                            <button type="submit" class="ml-2 text-sm text-emerald-600 hover:text-emerald-800 font-medium">Share link</button>
+                                                        </form>
+                                                        @if($surveyItem->public_token)
+                                                            <div class="mt-1 text-xs text-slate-600">
+                                                                Public URL:
+                                                                <a class="text-indigo-600 hover:underline" href="{{ url('/survey/'.$surveyItem->public_token) }}" target="_blank">
+                                                                    {{ url('/survey/'.$surveyItem->public_token) }}
+                                                                </a>
+                                                            </div>
+                                                        @endif
                                                         <a href="{{ route('surveys.questions.create', $surveyItem) }}" class="block mt-1 text-green-600 hover:text-green-800 text-sm font-medium">Ajouter une question</a>
                                                         <form action="{{ route('surveys.destroy', $surveyItem) }}" method="POST" class="inline">
                                                             @csrf
