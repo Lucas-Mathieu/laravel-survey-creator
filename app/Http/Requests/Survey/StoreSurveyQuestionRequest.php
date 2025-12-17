@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Survey;
 
 use Illuminate\Foundation\Http\FormRequest;
+use App\Models\SurveyQuestion;
 
 class StoreSurveyQuestionRequest extends FormRequest
 {
@@ -11,7 +12,7 @@ class StoreSurveyQuestionRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return auth()->check() && auth()->user()->can('create', SurveyQuestion::class);
+        return auth()->check()  ;
     }
 
     /**
@@ -23,8 +24,8 @@ class StoreSurveyQuestionRequest extends FormRequest
     {
         return [
             'title' => 'required|string|max:255',
-            'question_type' => 'required|string|in:multiple_choice,text,checkbox',
-            'options' => 'json|required_if:question_type,multiple_choice,checkbox',
+            'question_type' => 'required|string|in:multiple_choice,text,checkbox,unique_choice,scale_from_1_to_10',
+            'options' => 'json|required_if:question_type,multiple_choice,unique_choice',
             'survey_id' => 'required|exists:surveys,id',
         ];
     }

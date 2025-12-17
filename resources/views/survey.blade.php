@@ -54,6 +54,7 @@
                                                     <td class="px-4 py-2 text-slate-700">{{ $surveyItem->is_anonymous ? 'Yes' : 'No' }}</td>
                                                     <td class="px-4 py-2 text-slate-700">
                                                         <a href="{{ route('surveys.edit', $surveyItem) }}" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">Edit</a>
+                                                        <a href="{{ route('surveys.questions.create', $surveyItem) }}" class="block mt-1 text-green-600 hover:text-green-800 text-sm font-medium">Ajouter une question</a>
                                                         <form action="{{ route('surveys.destroy', $surveyItem) }}" method="POST" class="inline">
                                                             @csrf
                                                             @method('DELETE')

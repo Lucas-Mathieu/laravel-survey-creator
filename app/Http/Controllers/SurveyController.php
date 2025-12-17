@@ -4,12 +4,16 @@ namespace App\Http\Controllers;
 
 use App\Actions\Survey\StoreSurveyAction;
 use App\Actions\Survey\UpdateSurveyAction;
+use App\Actions\Survey\StoreSurveyQuestionAction;
 use App\Http\Requests\Survey\StoreSurveyRequest;
 use App\Http\Requests\Survey\UpdateSurveyRequest;
 use App\Http\Requests\Survey\DeleteSurveyRequest;
 use App\DTOs\SurveyDTO;
+use App\DTOs\SurveyQuestionDTO;
 use App\Models\Survey;
 use App\Models\OrganizationUser;
+use App\Models\SurveyQuestion;
+use App\Http\Requests\Survey\StoreSurveyQuestionRequest;
 use Illuminate\Http\Request;
 
 class SurveyController extends Controller
@@ -62,6 +66,22 @@ class SurveyController extends Controller
         return redirect()
             ->route('surveys.index')
             ->with('status', 'Survey updated successfully.');
+    }
+
+    public function createQuestion(Request $request, Survey $survey)
+    {
+        return view('survey_question_create', [
+            'survey' => $survey,
+        ]);
+    }
+    public function storeQuestion(StoreSurveyQuestionRequest $request, Survey $survey)
+    {
+        $dto = SurveyQuestionDTO::fromRequest($request);
+        $question = $storeSurveyQuestion->handle($dto);
+
+        return redirect()
+            ->route('surveys.show', $survey)
+            ->with('status', 'Question created successfully.');
     }
 
     public function show(Survey $survey)
