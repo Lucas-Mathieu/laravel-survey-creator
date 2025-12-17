@@ -12,6 +12,7 @@ use App\Http\Requests\Organization\UpdateOrganization;
 use App\Http\Requests\Organization\DeleteOrganization;
 use App\Http\Requests\Organization\StoreOrganizationMember;
 use App\Http\Requests\Organization\DeleteOrganizationMember;
+use App\Http\Requests\Organization\SetActiveOrganization;
 
 use App\Actions\Organization\StoreOrganizationAction;
 use App\Actions\Organization\UpdateOrganizationAction;
@@ -120,23 +121,9 @@ class OrganizationController extends Controller
             ->with('status', 'Member removed successfully.');
     }
 
-    public function setActive(Request $request)
+    public function setActive(SetActiveOrganization $request)
     {
-        $request->validate([
-            'organization_id' => ['required', 'integer', 'exists:organizations,id'],
-        ]);
-
         $orgId = (int) $request->input('organization_id');
-
-        $belongs = OrganizationUser::where('organization_id', $orgId)
-            ->where('user_id', $request->user()->id)
-            ->exists();
-
-        if (! $belongs) {
-            return redirect()
-                ->route('organizations.index')
-                ->withErrors(['organization_id' => 'You are not a member of this organization.']);
-        }
 
         $request->session()->put('active_organization_id', $orgId);
 
