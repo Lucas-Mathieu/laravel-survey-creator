@@ -19,14 +19,10 @@ final class SurveyQuestionDTO
 
         if (is_string($data)) {
             $decoded = json_decode($data, true);
-            if (is_array($decoded)) {
-                $data = $decoded;
-            } else {
-                // Fallback: split by new lines or commas
-                $parts = preg_split('/[\r\n,]+/', $data);
-                $parts = array_values(array_filter(array_map('trim', $parts), fn ($v) => $v !== ''));
-                $data = $parts ?: null;
-            }
+            
+            $parts = preg_split('/[\r\n,]+/', $data);
+            $parts = array_values(array_filter(array_map('trim', $parts), fn ($v) => $v !== ''));
+            $data = $parts ?: null;
         }
 
         return new self(
