@@ -29,6 +29,7 @@ class UpdateSurveyRequest extends FormRequest
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
             'is_anonymous' => 'required|boolean',
+            'notify_on_answer' => 'sometimes|boolean',
         ];
     }
 

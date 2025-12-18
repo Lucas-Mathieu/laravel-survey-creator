@@ -27,6 +27,7 @@ final class StoreSurveyAction
                 'start_date' => $dto->startDate,
                 'end_date' => $dto->endDate,
                 'is_anonymous' => $dto->isAnonymous,
+                'notify_on_answer' => $dto->notifyOnAnswer,
                 'user_id' => $dto->userId,
                 'organization_id' => $organizationId,
             ]);

@@ -27,7 +27,7 @@ class SurveyAnswerController extends Controller
         $action->handle($dto);
 
         return redirect()
-            ->route('surveys.public', $survey->public_token)
+            ->route('surveys.public', ['token' => $survey->public_token])
             ->with('status', 'Thanks for your response.');
     }
 }

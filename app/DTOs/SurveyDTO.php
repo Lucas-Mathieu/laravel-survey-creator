@@ -14,6 +14,7 @@ final class SurveyDTO
         public readonly bool $isAnonymous,
         public readonly int $userId,
         public readonly ?int $organizationId,
+        public readonly bool $notifyOnAnswer,
     ) {}
 
     public static function fromRequest(Request $request): self
@@ -26,6 +27,7 @@ final class SurveyDTO
             isAnonymous: $request->boolean('is_anonymous'),
             userId: $request->user()->id,
             organizationId: $request->session()->get('active_organization_id'),
+            notifyOnAnswer: $request->boolean('notify_on_answer'),
         );
     }
 }

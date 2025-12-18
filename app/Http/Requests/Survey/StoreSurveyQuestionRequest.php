@@ -25,7 +25,7 @@ class StoreSurveyQuestionRequest extends FormRequest
         return [
             'title' => 'required|string|max:255',
             'question_type' => 'required|string|in:single_choice,multiple_choice,text,scale_1_10',
-            'data' => 'json|required_if:question_type,single_choice,multiple_choice',
+            'data' => 'required_if:question_type,single_choice,multiple_choice',
             'survey_id' => 'required|exists:surveys,id',
         ];
     }
