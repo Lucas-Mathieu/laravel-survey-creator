@@ -49,7 +49,7 @@ final class StoreSurveyAnswerAction
                 ])->toArray();
             }
 
-            event(new SurveyAnswerSubmitted());
+            event(new SurveyAnswerSubmitted($survey));
 
             return $created;
         });

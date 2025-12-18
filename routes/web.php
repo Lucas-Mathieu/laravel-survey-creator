@@ -47,5 +47,4 @@ Route::middleware('auth')->group(function () {
 
 Route::get('/survey/{token}', [SurveyController::class, 'publicShow'])->name('surveys.public');
 Route::post('/surveys/{survey}/answers', [SurveyAnswerController::class, 'store'])->name('surveys.answers.store');
-
 require __DIR__.'/auth.php';

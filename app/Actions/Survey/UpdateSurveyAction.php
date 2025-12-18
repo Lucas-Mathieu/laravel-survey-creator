@@ -36,6 +36,7 @@ final class UpdateSurveyAction
                 'start_date' => $dto->startDate,
                 'end_date' => $dto->endDate,
                 'is_anonymous' => $dto->isAnonymous,
+                'notify_on_answer' => $dto->notifyOnAnswer,
             ]);
 
             return $survey->refresh();
