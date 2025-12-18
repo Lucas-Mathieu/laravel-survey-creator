@@ -17,7 +17,7 @@ final class UpdateSurveyAction
      */
     public function handle(Survey $survey, SurveyDTO $dto): Survey
     {
-        $organizationId = session('organization_id') ?? $survey->organization_id;
+        $organizationId = $dto->organizationId ?? $survey->organization_id;
 
         if (!$organizationId) {
             throw ValidationException::withMessages([
@@ -36,6 +36,7 @@ final class UpdateSurveyAction
                 'start_date' => $dto->startDate,
                 'end_date' => $dto->endDate,
                 'is_anonymous' => $dto->isAnonymous,
+                'notify_on_answer' => $dto->notifyOnAnswer,
             ]);
 
             return $survey->refresh();

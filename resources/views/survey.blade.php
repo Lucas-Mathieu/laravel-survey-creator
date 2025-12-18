@@ -52,14 +52,28 @@
                                                     <td class="px-4 py-2 text-slate-700">{{ $surveyItem->start_date }}</td>
                                                     <td class="px-4 py-2 text-slate-700">{{ $surveyItem->end_date }}</td>
                                                     <td class="px-4 py-2 text-slate-700">{{ $surveyItem->is_anonymous ? 'Yes' : 'No' }}</td>
-                                                    <td class="px-4 py-2 text-slate-700">
-                                                        <a href="{{ route('surveys.edit', $surveyItem) }}" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">Edit</a>
-                                                        <a href="{{ route('surveys.questions.create', $surveyItem) }}" class="block mt-1 text-green-600 hover:text-green-800 text-sm font-medium">Ajouter une question</a>
-                                                        <form action="{{ route('surveys.destroy', $surveyItem) }}" method="POST" class="inline">
-                                                            @csrf
-                                                            @method('DELETE')
-                                                            <button type="submit" class="ml-2 text-sm text-red-600 hover:text-red-800 font-medium">Delete</button>
-                                                        </form>
+                                                    <td class="px-4 py-2 text-slate-700 space-y-2">
+                                                        <div class="flex flex-wrap gap-2">
+                                                            <a href="{{ route('surveys.edit', $surveyItem) }}" class="inline-flex items-center rounded-md bg-gray-800 px-3 py-1 text-xs font-semibold text-white shadow-sm hover:bg-gray-700">Edit</a>
+                                                            <a href="{{ route('surveys.questions.create', $surveyItem) }}" class="inline-flex items-center rounded-md bg-green-600 hover:bg-green-700 px-3 py-1 text-xs font-semibold text-white shadow-sm" style="background-color:#16a34a;">Add question</a>
+                                                            <form action="{{ route('surveys.share', $surveyItem) }}" method="POST" class="inline">
+                                                                @csrf
+                                                                <button type="submit" class="inline-flex items-center rounded-md bg-green-600 hover:bg-green-700 px-3 py-1 text-xs font-semibold text-white shadow-sm" style="background-color:#16a34a;">Share link</button>
+                                                            </form>
+                                                            <form action="{{ route('surveys.destroy', $surveyItem) }}" method="POST" class="inline">
+                                                                @csrf
+                                                                @method('DELETE')
+                                                                <button type="submit" class="inline-flex items-center rounded-md bg-red-600 px-3 py-1 text-xs font-semibold text-white shadow-sm hover:bg-red-700">Delete</button>
+                                                            </form>
+                                                        </div>
+                                                        @if($surveyItem->public_token)
+                                                            <div class="mt-1 text-xs text-slate-600">
+                                                                Public URL:
+                                                                <a class="text-indigo-600 hover:underline" href="{{ url('/survey/'.$surveyItem->public_token) }}" target="_blank">
+                                                                    {{ url('/survey/'.$surveyItem->public_token) }}
+                                                                </a>
+                                                            </div>
+                                                        @endif
                                                     </td>
                                                 </tr>
                                             @endforeach
@@ -132,10 +146,23 @@
                                     >
                                     <label for="edit_is_anonymous" class="text-sm font-medium text-slate-900">Anonymous survey</label>
                                 </div>
+                                <div class="flex items-center space-x-3">
+                                    <input type="hidden" name="notify_on_answer" value="0">
+                                    <input
+                                        id="edit_notify_on_answer"
+                                        name="notify_on_answer"
+                                        type="checkbox"
+                                        value="1"
+                                        @checked(old('notify_on_answer', $survey->notify_on_answer ?? false))
+                                        class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                                    >
+                                    <label for="edit_notify_on_answer" class="text-sm font-medium text-slate-900">Email me on new answer</label>
+                                </div>
                                 <div class="flex justify-end">
                                     <button
                                         type="submit"
-                                        class="inline-flex items-center rounded-md bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                                        class="inline-flex items-center rounded-md bg-green-600 hover:bg-green-700 px-4 py-2 text-sm font-semibold text-white shadow-sm transition focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                                        style="background-color:#16a34a;"
                                     >
                                         Update
                                     </button>
@@ -210,11 +237,24 @@
                             >
                             <label for="is_anonymous" class="text-sm font-medium text-slate-900">Anonymous survey</label>
                         </div>
+                        <div class="flex items-center space-x-3">
+                            <input type="hidden" name="notify_on_answer" value="0">
+                            <input
+                                id="notify_on_answer"
+                                name="notify_on_answer"
+                                type="checkbox"
+                                value="1"
+                                @checked(old('notify_on_answer'))
+                                class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                            >
+                            <label for="notify_on_answer" class="text-sm font-medium text-slate-900">Email me on new answer</label>
+                        </div>
 
                         <div class="flex justify-end">
                             <button
                                 type="submit"
-                                class="inline-flex items-center rounded-md bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                                class="inline-flex items-center rounded-md bg-green-600 hover:bg-green-700 px-4 py-2 text-sm font-semibold text-white shadow-sm transition focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                                style="background-color:#16a34a;"
                             >
                                 Save
                             </button>

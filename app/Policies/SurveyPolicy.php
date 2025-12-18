@@ -33,14 +33,15 @@ class SurveyPolicy
      */
     public function create(User $user): bool
     {
-        $orgId = session('organization_id');
+        $orgId = session('active_organization_id') ?? session('organization_id');
 
-        if ($orgId && OrganizationUser::where('organization_id', $orgId)->where('user_id', $user->id)->exists()) {
-            return true;
+        if (! $orgId) {
+            return false;
         }
 
-        // fallback: autoriser si l'utilisateur a au moins une organisation
-        return OrganizationUser::where('user_id', $user->id)->exists();
+        return OrganizationUser::where('organization_id', $orgId)
+            ->where('user_id', $user->id)
+            ->exists();
     }
 
     /**
@@ -89,5 +90,13 @@ class SurveyPolicy
     public function forceDelete(User $user, Survey $survey): bool
     {
         return $this->delete($user, $survey);
+    }
+
+    /**
+     * Determine whether the user can view results of the survey.
+     */
+    public function viewResults(User $user, Survey $survey): bool
+    {
+        return $this->view($user, $survey);
     }
 }

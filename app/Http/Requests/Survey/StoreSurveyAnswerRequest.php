@@ -11,7 +11,7 @@ class StoreSurveyAnswerRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,10 @@ class StoreSurveyAnswerRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'survey_id' => ['required', 'integer', 'exists:surveys,id'],
+            'answers' => ['required', 'array', 'min:1'],
+            'answers.*.question_id' => ['required', 'integer', 'exists:survey_questions,id'],
+            'answers.*.answer' => ['required'],
         ];
     }
 }
