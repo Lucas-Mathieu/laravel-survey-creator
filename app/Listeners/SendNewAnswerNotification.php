@@ -27,6 +27,7 @@ class SendNewAnswerNotification implements ShouldQueue
             return;
         }
 
-        Mail::to($survey->user->email)->queue(new NewSurveyAnswerMail($survey));
+        // Listener is already queued; send the mail directly to avoid double-queuing.
+        Mail::to($survey->user->email)->send(new NewSurveyAnswerMail($survey));
     }
 }
