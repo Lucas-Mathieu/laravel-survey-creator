@@ -23,7 +23,13 @@ class StoreSurveyAnswerActionTest extends TestCase
 
     public function test_handle_creates_answers_correctly(): void
     {
-        $user = User::factory()->create();
+        $user = User::create([
+            'name' => 'Test User',
+            'first_name' => 'Test',
+            'last_name' => 'User',
+            'email' => 'test@example.com',
+            'password' => bcrypt('password'),
+        ]);
         $org = Organization::create(['name' => 'Org', 'user_id' => $user->id]);
         $survey = Survey::create([
             'organization_id' => $org->id,
@@ -52,8 +58,10 @@ class StoreSurveyAnswerActionTest extends TestCase
         );
 
         $action = app(StoreSurveyAnswerAction::class);
-        $action->handle($dto);
+        $created = $action->handle($dto);
 
+        $this->assertIsArray($created);
+        $this->assertCount(1, $created);
         $this->assertDatabaseHas('survey_answers', [
             'survey_id' => $survey->id,
             'survey_question_id' => $question->id,
@@ -66,7 +74,13 @@ class StoreSurveyAnswerActionTest extends TestCase
     {
         Mail::fake();
 
-        $user = User::factory()->create(['email' => 'owner@example.com']);
+        $user = User::create([
+            'name' => 'Owner',
+            'first_name' => 'Owner',
+            'last_name' => 'User',
+            'email' => 'owner@example.com',
+            'password' => bcrypt('password'),
+        ]);
         $org = Organization::create(['name' => 'Org', 'user_id' => $user->id]);
         $survey = Survey::create([
             'organization_id' => $org->id,
@@ -83,7 +97,7 @@ class StoreSurveyAnswerActionTest extends TestCase
         $listener = new SendNewAnswerNotification();
         $listener->handle(new SurveyAnswerSubmitted($survey));
 
-        Mail::assertQueued(NewSurveyAnswerMail::class, function ($mail) use ($survey) {
+        Mail::assertSent(NewSurveyAnswerMail::class, function ($mail) use ($survey) {
             return $mail->hasTo($survey->user->email);
         });
     }
