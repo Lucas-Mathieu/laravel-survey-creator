@@ -61,7 +61,7 @@
                                 rows="4"
                                 class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm text-slate-900 focus:border-indigo-500 focus:ring-indigo-500"
                             >{{ old('data') }}</textarea>
-                            <p class="text-xs text-slate-500">Example: ["Option A", "Option B", "Option C"]</p>
+                            <p class="text-xs text-slate-500">Example: "Option 1, Option 2, Option 3"</p>
                         </div>
 
                         <div class="flex justify-end">
