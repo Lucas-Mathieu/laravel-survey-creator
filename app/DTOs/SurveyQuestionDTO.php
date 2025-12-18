@@ -19,14 +19,20 @@ final class SurveyQuestionDTO
 
         if (is_string($data)) {
             $decoded = json_decode($data, true);
-            $data = is_array($decoded) ? $decoded : null;
+            if (is_array($decoded)) {
+                $data = $decoded;
+            } else {
+                $parts = preg_split('/[\\r\\n,]+/', $data);
+                $parts = array_values(array_filter(array_map('trim', $parts), fn ($v) => $v !== ''));
+                $data = $parts ?: null;
+            }
         }
 
         return new self(
             title: $request->input('title'),
             questionType: $request->input('question_type'),
             data: $data,
-            surveyId: $request->input('survey_id'),
+            surveyId: (int) ($request->input('survey_id') ?? $request->route('survey')?->id),
         );
     }
 }
