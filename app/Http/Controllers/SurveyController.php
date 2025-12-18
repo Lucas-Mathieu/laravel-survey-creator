@@ -108,7 +108,7 @@ class SurveyController extends Controller
         $storeSurveyQuestion->handle($dto);
 
         return redirect()
-            ->route('surveys.index')
+            ->route('surveys.questions.create', $survey)
             ->with('status', 'Question created successfully.');
     }
 
