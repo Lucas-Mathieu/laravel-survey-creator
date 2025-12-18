@@ -97,7 +97,7 @@ class StoreSurveyAnswerActionTest extends TestCase
         $listener = new SendNewAnswerNotification();
         $listener->handle(new SurveyAnswerSubmitted($survey));
 
-        Mail::assertSent(NewSurveyAnswerMail::class, function ($mail) use ($survey) {
+        Mail::assertQueued(NewSurveyAnswerMail::class, function ($mail) use ($survey) {
             return $mail->hasTo($survey->user->email);
         });
     }
