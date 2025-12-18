@@ -17,6 +17,6 @@ class SurveyQuestion extends Model
         'created_at', 'updated_at'
     ];
     protected $casts = [
-        'options' => 'array',
+        'data' => 'array',
     ];
 }
