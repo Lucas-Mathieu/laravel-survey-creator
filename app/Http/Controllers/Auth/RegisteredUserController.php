@@ -29,16 +29,35 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
-        $request->validate([
-            'last_name'     => ['required', 'string', 'max:255'],
-            'first_name'    => ['required', 'string', 'max:255'],
-            'email'         => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
-            'password'      => ['required', 'confirmed', Rules\Password::defaults()],
-        ]);
+        // Accept both the original "name" field (used by Breeze tests) and the
+        // split "first_name/last_name" fields used elsewhere in the app.
+        if ($request->filled('name')) {
+            $request->validate([
+                'name'          => ['required', 'string', 'max:255'],
+                'email'         => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+                'password'      => ['required', 'confirmed', Rules\Password::defaults()],
+            ]);
+
+            // Attempt to split the full name; fallback keeps everything in first_name.
+            $parts = preg_split('/\s+/', trim($request->name), 2);
+            $firstName = $parts[0] ?? '';
+            $lastName = $parts[1] ?? '';
+        } else {
+            $request->validate([
+                'last_name'     => ['required', 'string', 'max:255'],
+                'first_name'    => ['required', 'string', 'max:255'],
+                'email'         => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+                'password'      => ['required', 'confirmed', Rules\Password::defaults()],
+            ]);
+
+            $firstName = $request->first_name;
+            $lastName = $request->last_name;
+        }
 
         $user = User::create([
-            'last_name'     => $request->last_name,
-            'first_name'    => $request->first_name,
+            'name'          => trim("{$firstName} {$lastName}") ?: null,
+            'last_name'     => $lastName ?: null,
+            'first_name'    => $firstName ?: null,
             'email'         => $request->email,
             'password'      => Hash::make($request->password),
         ]);
