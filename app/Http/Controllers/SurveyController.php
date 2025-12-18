@@ -96,14 +96,12 @@ class SurveyController extends Controller
 
     public function createQuestion(Request $request, Survey $survey)
     {
-        // Render the question creation form for this survey.
         return view('survey_question_create', [
             'survey' => $survey,
         ]);
     }
     public function storeQuestion(StoreSurveyQuestionRequest $request, Survey $survey, StoreSurveyQuestionAction $storeSurveyQuestion)
-    {
-        // Persist a question linked to this survey.
+    {  
         $dto = SurveyQuestionDTO::fromRequest($request);
         $storeSurveyQuestion->handle($dto);
 
@@ -114,7 +112,6 @@ class SurveyController extends Controller
 
     public function show(Survey $survey)
     {
-        // Show survey JSON for internal usage.
         $this->authorize('view', $survey);
 
         return response()->json([
